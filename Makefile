@@ -44,19 +44,22 @@ pgbouncer_SOURCES = \
 	include/util.h \
 	include/varcache.h
 
-pgbouncer_CPPFLAGS = -Iinclude $(CARES_CFLAGS) $(TLS_CPPFLAGS)
+pgbouncer_CPPFLAGS = -g -O0 -Iinclude $(CARES_CFLAGS) $(TLS_CPPFLAGS)
 
 # include libusual sources directly
 AM_FEATURES = libusual
 pgbouncer_EMBED_LIBUSUAL = 1
 
 # docs to install as-is
-dist_doc_DATA = README.md NEWS.md etc/pgbouncer.ini etc/userlist.txt
+# dist_doc_DATA = README.md NEWS.md etc/pgbouncer.ini etc/userlist.txt
+dist_doc_DATA =
 
 DISTCLEANFILES = config.mak config.status lib/usual/config.h config.log
 
-DIST_SUBDIRS = doc test
-dist_man_MANS = doc/pgbouncer.1 doc/pgbouncer.5
+# DIST_SUBDIRS = doc test
+DIST_SUBDIRS = test
+# dist_man_MANS = doc/pgbouncer.1 doc/pgbouncer.5
+dist_man_MANS =
 
 # files in tgz
 EXTRA_DIST = AUTHORS COPYRIGHT Makefile config.mak.in config.sub config.guess \
@@ -148,10 +151,10 @@ tgz-up: $(tgz)
 tags:
 	ctags src/*.c include/*.h lib/usual/*.[ch] lib/usual/*/*.[ch]
 
-htmls:
-	for f in *.md doc/*.md; do \
-		mkdir -p html && $(PANDOC) $$f -o html/`basename $$f`.html; \
-	done
+# htmls:
+# 	for f in *.md doc/*.md; do \
+# 		mkdir -p html && $(PANDOC) $$f -o html/`basename $$f`.html; \
+# 	done
 
-doc/pgbouncer.1 doc/pgbouncer.5:
-	$(MAKE) -C doc
+# doc/pgbouncer.1 doc/pgbouncer.5:
+# 	$(MAKE) -C doc

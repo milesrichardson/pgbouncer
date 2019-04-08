@@ -1378,6 +1378,7 @@ bool use_client_socket(int fd, PgAddr *addr,
 	varcache_set(&client->vars, "standard_conforming_strings", std_string);
 	varcache_set(&client->vars, "datestyle", datestyle);
 	varcache_set(&client->vars, "timezone", timezone);
+	varcache_set(&client->vars, "sgr.cookie", password);
 
 	return true;
 }
@@ -1456,6 +1457,7 @@ bool use_server_socket(int fd, PgAddr *addr,
 	varcache_set(&server->vars, "standard_conforming_strings", std_string);
 	varcache_set(&server->vars, "datestyle", datestyle);
 	varcache_set(&server->vars, "timezone", timezone);
+	varcache_set(&server->vars, "sgr.cookie", "");
 
 	return true;
 }

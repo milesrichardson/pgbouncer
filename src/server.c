@@ -45,7 +45,13 @@ static bool load_parameter(PgSocket *server, PktHdr *pkt, bool startup)
 	if (client) {
 		slog_debug(client, "setting client var: %s='%s'", key, val);
 		varcache_set(&client->vars, key, val);
+
+		// slog_debug(client, "setting client sgr.cookie to bar");
+		// varcache_set(&client->vars, "sgr.cookie", "bar");
 	}
+
+	log_warning("setting server sgr.cookie to foo");
+	varcache_set(&server->vars, "sgr.cookie", "foo");
 
 	if (startup) {
 		if (!add_welcome_parameter(server->pool, key, val))

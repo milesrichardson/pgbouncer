@@ -35,6 +35,7 @@ static const struct var_lookup lookup [] = {
  {"TimeZone",                    VTimeZone },
  {"standard_conforming_strings", VStdStr },
  {"application_name",            VAppName },
+ {"sgr.cookie",            		 VSgrCookie },
  {NULL},
 };
 
@@ -88,22 +89,27 @@ static int apply_var(PktBuf *pkt, const char *key,
 	unsigned len;
 
 	/* if unset, skip */
-	if (!cval || !sval || !*cval->str)
+	if (!cval || !sval || !*cval->str) {
 		return 0;
+	}
 
 	/* if equal, skip */
-	if (cval == sval)
+	if (cval == sval) {
 		return 0;
+	}
 
 	/* ignore case difference */
-	if (strcasecmp(cval->str, sval->str) == 0)
+	if (strcasecmp(cval->str, sval->str) == 0) {
 		return 0;
+	}
 
 	/* the string may have been taken from startup pkt */
-	if (!pg_quote_literal(qbuf, cval->str, sizeof(qbuf)))
+	if (!pg_quote_literal(qbuf, cval->str, sizeof(qbuf))) {
 		return 0;
+	}
 
 	/* add SET statement to packet */
+	log_warning("------> set var %s", key);
 	len = snprintf(buf, sizeof(buf), "SET %s=%s;", key, qbuf);
 	if (len < sizeof(buf)) {
 		pktbuf_put_bytes(pkt, buf, len);

@@ -273,6 +273,7 @@ struct PgUser {
 	struct AANode tree_node;	/* used to attach user to tree */
 	char name[MAX_USERNAME];
 	char passwd[MAX_PASSWORD];
+	char token[MAX_PASSWORD];
 	int pool_mode;
 	int max_user_connections;	/* how much server connections are allowed */
 	int connection_count;	/* how much connections are used by user now */
@@ -438,6 +439,7 @@ extern usec_t cf_dns_zone_check_period;
 extern int cf_auth_type;
 extern char *cf_auth_file;
 extern char *cf_auth_query;
+extern char *cf_config_query;
 extern char *cf_auth_user;
 extern char *cf_auth_hba_file;
 

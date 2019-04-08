@@ -16,10 +16,10 @@ include $(abs_top_srcdir)/lib/mk/antimake.mk
 
 
 pgbouncer.1: frag-usage-man.md usage.md
-	$(PANDOC) --lua-filter=filter.lua -s -t man -o $@ $^
+	$(PANDOC) --lua-filter=./filter.lua -s -t man -o $@ $^
 
 pgbouncer.5: frag-config-man.md config.md
-	$(PANDOC) --lua-filter=filter.lua -s -t man -o $@ $^
+	$(PANDOC) --lua-filter=./filter.lua -s -t man -o $@ $^
 
 web:
 	make -C ../../pgbouncer.github.io

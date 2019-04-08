@@ -92,6 +92,7 @@ char *cf_auth_file;
 char *cf_auth_hba_file;
 char *cf_auth_user;
 char *cf_auth_query;
+char *cf_config_query;
 
 int cf_max_client_conn;
 int cf_default_pool_size;
@@ -218,6 +219,7 @@ CF_ABS("auth_file", CF_STR, cf_auth_file, 0, NULL),
 CF_ABS("auth_hba_file", CF_STR, cf_auth_hba_file, 0, ""),
 CF_ABS("auth_user", CF_STR, cf_auth_user, 0, NULL),
 CF_ABS("auth_query", CF_STR, cf_auth_query, 0, "SELECT usename, passwd FROM pg_shadow WHERE usename=$1"),
+CF_ABS("config_query", CF_STR, cf_config_query, 0, ""),
 CF_ABS("pool_mode", CF_LOOKUP(pool_mode_map), cf_pool_mode, 0, "session"),
 CF_ABS("max_client_conn", CF_INT, cf_max_client_conn, 0, "100"),
 CF_ABS("default_pool_size", CF_INT, cf_default_pool_size, 0, "20"),
@@ -789,6 +791,7 @@ static void cleanup(void)
 	xfree(&cf_auth_file);
 	xfree(&cf_auth_hba_file);
 	xfree(&cf_auth_query);
+	xfree(&cf_config_query);
 	xfree(&cf_auth_user);
 	xfree(&cf_server_reset_query);
 	xfree(&cf_server_check_query);

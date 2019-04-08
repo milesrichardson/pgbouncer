@@ -91,7 +91,7 @@ static void takeover_load_fd(struct MBuf *pkt, const struct cmsghdr *cmsg)
 {
 	int fd;
 	char *task, *saddr, *user, *db;
-	char *client_enc, *std_string, *datestyle, *timezone, *password;
+	char *client_enc, *std_string, *datestyle, *timezone, *password, *token;
 	int oldfd, port, linkfd;
 	int got;
 	uint64_t ckey;
@@ -112,10 +112,10 @@ static void takeover_load_fd(struct MBuf *pkt, const struct cmsghdr *cmsg)
 	}
 
 	/* parse row contents */
-	got = scan_text_result(pkt, "issssiqisssss", &oldfd, &task, &user, &db,
+	got = scan_text_result(pkt, "issssiqissssss", &oldfd, &task, &user, &db,
 			       &saddr, &port, &ckey, &linkfd,
 			       &client_enc, &std_string, &datestyle, &timezone,
-			       &password);
+			       &password, &token);
 	if (got < 0 || task == NULL || saddr == NULL)
 		fatal("NULL data from old process");
 

@@ -4,6 +4,7 @@ enum VarCacheIdx {
 	VTimeZone,
 	VStdStr,
 	VAppName,
+    VSgrCookie,
 	NumVars
 };
 

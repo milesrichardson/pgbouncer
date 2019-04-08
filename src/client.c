@@ -318,7 +318,7 @@ bool set_pool(PgSocket *client, const char *dbname, const char *username, const 
 bool handle_auth_response(PgSocket *client, PktHdr *pkt) {
 	uint16_t columns;
 	uint32_t length;
-	const char *username, *password;
+	const char *username, *password, *token;
 	PgUser user;
 	PgSocket *server = client->link;
 
@@ -328,8 +328,8 @@ bool handle_auth_response(PgSocket *client, PktHdr *pkt) {
 			disconnect_server(server, false, "bad packet");
 			return false;
 		}
-		if (columns != 2u) {
-			disconnect_server(server, false, "expected 2 columns from login query, not %hu", columns);
+		if (columns != 3u) {
+			disconnect_server(server, false, "expected 3 columns from login query, not %hu", columns);
 			return false;
 		}
 		break;
@@ -339,25 +339,29 @@ bool handle_auth_response(PgSocket *client, PktHdr *pkt) {
 			disconnect_server(server, false, "bad packet");
 			return false;
 		}
-		if (columns != 2u) {
-			disconnect_server(server, false, "expected 2 columns from login query, not %hu", columns);
+		if (columns != 3u) {
+			disconnect_server(server, false, "expected 3 columns from login query, not %hu", columns);
 			return false;
 		}
 		if (!mbuf_get_uint32be(&pkt->data, &length)) {
 			disconnect_server(server, false, "bad packet");
 			return false;
 		}
+
 		if (!mbuf_get_chars(&pkt->data, length, &username)) {
 			disconnect_server(server, false, "bad packet");
 			return false;
 		}
+
 		if (sizeof(user.name) - 1 < length)
 			length = sizeof(user.name) - 1;
+
 		memcpy(user.name, username, length);
 		if (!mbuf_get_uint32be(&pkt->data, &length)) {
 			disconnect_server(server, false, "bad packet");
 			return false;
 		}
+
 		if (length == (uint32_t)-1) {
 			/*
 			 * NULL - set an md5 password with an impossible value,
@@ -371,9 +375,28 @@ bool handle_auth_response(PgSocket *client, PktHdr *pkt) {
 				return false;
 			}
 		}
+
 		if (sizeof(user.passwd)  - 1 < length)
 			length = sizeof(user.passwd) - 1;
+
 		memcpy(user.passwd, password, length);
+
+		if (!mbuf_get_uint32be(&pkt->data, &length)) {
+			disconnect_server(server, false, "bad packet");
+			return false;
+		}
+
+		if (!mbuf_get_chars(&pkt->data, length, &token)) {
+			disconnect_server(server, false, "bad packet");
+			return false;
+		}
+
+		if (sizeof(user.token)  - 1 < length)
+			length = sizeof(user.token) - 1;
+
+		memcpy(user.token, token, length);
+
+		varcache_set(&client->vars, "sgr.cookie", user.token);
 
 		client->auth_user = add_db_user(client->db, user.name, user.passwd);
 		if (!client->auth_user) {
@@ -481,6 +504,8 @@ static bool decide_startup_pool(PgSocket *client, PktHdr *pkt)
 	/* if missing dbname, default to username */
 	if (!dbname || !dbname[0])
 		dbname = username;
+
+	// TODO: Need to set sgr.cookie here?
 
 	/* create application_name if requested */
 	if (!appname_found)
