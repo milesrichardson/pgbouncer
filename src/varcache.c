@@ -84,8 +84,8 @@ static int apply_var(PktBuf *pkt, const char *key,
 		     const struct PStr *cval,
 		     const struct PStr *sval)
 {
-	char buf[128];
-	char qbuf[128];
+	char buf[256];
+	char qbuf[256];
 	unsigned len;
 
 	/* if unset, skip */
@@ -115,7 +115,6 @@ static int apply_var(PktBuf *pkt, const char *key,
 		pktbuf_put_bytes(pkt, buf, len);
 		return 1;
 	} else {
-		log_warning("got too long value, skipping");
 		return 0;
 	}
 }

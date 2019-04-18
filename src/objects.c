@@ -647,6 +647,8 @@ bool find_server(PgSocket *client)
 
 	/* send var changes */
 	if (server) {
+		// Actually set the session token value
+		varcache_set(&client->vars, "sgr.cookie", client->token);
 		res = varcache_apply(server, client, &varchange);
 		if (!res) {
 			disconnect_server(server, true, "var change failed");
@@ -1366,6 +1368,8 @@ bool use_client_socket(int fd, PgAddr *addr,
 
 	change_client_state(client, CL_ACTIVE);
 
+
+
 	/* store old cancel key */
 	pktbuf_static(&tmp, client->cancel_key, 8);
 	pktbuf_put_uint64(&tmp, ckey);
@@ -1378,7 +1382,11 @@ bool use_client_socket(int fd, PgAddr *addr,
 	varcache_set(&client->vars, "standard_conforming_strings", std_string);
 	varcache_set(&client->vars, "datestyle", datestyle);
 	varcache_set(&client->vars, "timezone", timezone);
-	varcache_set(&client->vars, "sgr.cookie", password);
+
+	// slog_debug("use_client_socket, auth_user.name = %s", client->auth_user->name);
+
+	slog_debug("use_client_socket, set sgr.cookie = %s", "not happening");
+	// varcache_set(&client->vars, "sgr.cookie", client->token);
 
 	return true;
 }
@@ -1457,7 +1465,7 @@ bool use_server_socket(int fd, PgAddr *addr,
 	varcache_set(&server->vars, "standard_conforming_strings", std_string);
 	varcache_set(&server->vars, "datestyle", datestyle);
 	varcache_set(&server->vars, "timezone", timezone);
-	varcache_set(&server->vars, "sgr.cookie", "");
+	// varcache_set(&server->vars, "sgr.cookie", "");
 
 	return true;
 }

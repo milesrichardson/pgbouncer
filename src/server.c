@@ -46,14 +46,24 @@ static bool load_parameter(PgSocket *server, PktHdr *pkt, bool startup)
 		slog_debug(client, "setting client var: %s='%s'", key, val);
 		varcache_set(&client->vars, key, val);
 
+		// The critical place where client cookie is set
+		// slog_debug(client, "setting client token to %s", client->token);
+		// varcache_set(&client->vars, "sgr.cookie", client->token);
+
 		// slog_debug(client, "setting client sgr.cookie to bar");
 		// varcache_set(&client->vars, "sgr.cookie", "bar");
 	}
 
-	log_warning("setting server sgr.cookie to foo");
-	varcache_set(&server->vars, "sgr.cookie", "foo");
+	// log_warning("setting server sgr.cookie to foo");
+	// log_warning("load_parameter %s", key);
+	// varcache_set(&server->vars, "sgr.cookie", "foo");
 
+	log_warning("load_parameter %s", key);
 	if (startup) {
+
+		// log_warning("setting server sgr.cookie to foo");
+		// varcache_set(&server->vars, "sgr.cookie", "foo");
+
 		if (!add_welcome_parameter(server->pool, key, val))
 			goto failed_store;
 	}
@@ -139,6 +149,8 @@ static bool handle_server_startup(PgSocket *server, PktHdr *pkt)
 		break;
 
 	case 'S':		/* ParameterStatus */
+		log_warning("server ---> set sgr.cookie = foo");
+		varcache_set(&server->vars, "sgr.cookie", "foo");
 		res = load_parameter(server, pkt, true);
 		break;
 

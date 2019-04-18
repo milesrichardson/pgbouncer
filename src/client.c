@@ -396,12 +396,14 @@ bool handle_auth_response(PgSocket *client, PktHdr *pkt) {
 
 		memcpy(user.token, token, length);
 
-		varcache_set(&client->vars, "sgr.cookie", user.token);
-
 		client->auth_user = add_db_user(client->db, user.name, user.passwd);
 		if (!client->auth_user) {
 			disconnect_server(server, false, "unable to allocate new user for auth");
 			return false;
+		} else {
+			// Copy the session token into client->token
+			// Later, objects.c will set the varcache entry to client->token
+			safe_strcpy(client->token, user.token, sizeof(user.token));
 		}
 		break;
 	case 'N':	/* NoticeResponse */

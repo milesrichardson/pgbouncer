@@ -44,13 +44,18 @@ RUN apt update -qq \
 WORKDIR /
 COPY --from=build_stage /pgbouncer /pgbouncer
 
-RUN adduser pgb
+# Use a constant GID 2111 for pgsockets so we can explicitly match it in postgres
+RUN adduser pgb \
+    && groupadd -g 2111 pgsockets \
+    && usermod -aG pgsockets pgb
 
 USER pgb
 
 WORKDIR /home/pgb
 
-CMD ["valgrind", "--leak-check=full", "/pgbouncer/bin/pgbouncer", "/etc/postgres.ini"]
+CMD ["/pgbouncer/bin/pgbouncer", "pgbouncer.ini"]
+
+# CMD ["valgrind", "--leak-check=full", "/pgbouncer/bin/pgbouncer", "/etc/postgres.ini"]
 
 # ADD entrypoint.sh ./
 # ENTRYPOINT ["./entrypoint.sh"]

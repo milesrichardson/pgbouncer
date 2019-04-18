@@ -112,6 +112,17 @@ extern int cf_sbuf_len;
 #define MAX_USERNAME	64
 #define MAX_PASSWORD	128
 
+/*
+	Note: MAX_TOKEN is the space allocated for the token
+		  in memory. However, the token is SET in a query along
+		  with other session parameters, and that query also has
+		  a maximum buffer size. It is possible the entire token
+		  may not be able to be SET in the presence of other parameters
+		  that need to be SET in the same query, in the case that the entire
+		  packet is too big
+*/
+#define MAX_TOKEN 		256
+
 /* no-auth modes */
 #define AUTH_ANY	-1 /* same as trust but without username check */
 #define AUTH_TRUST	AUTH_OK
@@ -273,7 +284,7 @@ struct PgUser {
 	struct AANode tree_node;	/* used to attach user to tree */
 	char name[MAX_USERNAME];
 	char passwd[MAX_PASSWORD];
-	char token[MAX_PASSWORD];
+	char token[MAX_TOKEN];
 	int pool_mode;
 	int max_user_connections;	/* how much server connections are allowed */
 	int connection_count;	/* how much connections are used by user now */
@@ -373,6 +384,8 @@ struct PgSocket {
 		struct DNSToken *dns_token;	/* ongoing request */
 		PgDatabase *db;			/* cache db while doing auth query */
 	};
+
+	char token[MAX_TOKEN];
 
 	VarCache vars;		/* state of interesting server parameters */
 
